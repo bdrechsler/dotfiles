@@ -1,0 +1,6 @@
+# Vim 
+plugged/
+.vim/undo/
+.vim/swap/
+.vim/backup/
+.netrwhist
