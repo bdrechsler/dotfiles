@@ -1,0 +1,140 @@
+" ============================================================================
+" ~/.vimrc
+" ============================================================================
+
+
+" ----------------------------------------------------------------------------
+" General settings
+" ----------------------------------------------------------------------------
+
+syntax enable                 " Turn on syntax highlighting
+filetype plugin indent on     " Load filetype-specific plugins and indent rules
+
+" Indentation
+set expandtab                 " Insert spaces instead of tab characters
+set tabstop=4                 " A <Tab> is displayed as 4 columns wide
+set shiftwidth=4              " Indent/outdent (>>, <<, auto-indent) by 4 spaces
+set autoindent                " New lines keep the indentation of the previous line
+
+" Interface
+set number                    " Show line numbers
+set termguicolors             " Use 24-bit (true) color in the terminal
+
+" Searching
+set hlsearch                  " Highlight all matches of the last search
+set incsearch                 " Show matches as you type the search pattern
+
+" Clipboard
+set clipboard=unnamed         " Yank/paste using the system (macOS) clipboard
+
+" File explorer (netrw)
+let g:netrw_liststyle = 3     " Show the built-in file explorer as a tree
+
+
+" ----------------------------------------------------------------------------
+" Leader key
+" ----------------------------------------------------------------------------
+
+" Stop <Space> from moving the cursor and use it as the <leader> key instead
+nnoremap <Space> <Nop>
+let mapleader = " "
+
+
+" ----------------------------------------------------------------------------
+" Key mappings
+" ----------------------------------------------------------------------------
+
+" Window navigation: Ctrl + h/j/k/l moves to the split left/down/up/right
+" (vim-tmux-navigator below extends these to also move between tmux panes)
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+" Type 'jk' quickly in insert mode to return to normal mode
+inoremap jk <esc>
+
+" Press <Esc> in normal mode to clear search highlighting
+nnoremap <esc> :nohl<CR>
+
+" Tabs: L -> next tab, H -> previous tab, <Space>t -> open a new tab
+nnoremap L :tabn<CR>
+nnoremap H :tabp<CR>
+nnoremap <leader>t :tabnew<CR>
+
+" <Space>e -> toggle the file explorer (netrw) in a left-side split
+nnoremap <leader>e :Lexplore<CR>
+
+
+" ----------------------------------------------------------------------------
+" Filetype-specific settings
+" ----------------------------------------------------------------------------
+
+" Enable US-English spell checking in LaTeX files
+autocmd FileType tex setlocal spell spelllang=en_us
+
+" Python files only: <Space>r -> save the current file and run it with Python
+" (<buffer> limits the mapping to the current buffer)
+autocmd FileType python nnoremap <buffer> <leader>r :w<CR>:!python %<CR>
+
+
+" ----------------------------------------------------------------------------
+" Plugins (managed by vim-plug: run :PlugInstall after adding a new one)
+" ----------------------------------------------------------------------------
+
+call plug#begin()
+Plug 'lervag/vimtex'                    " LaTeX editing, compiling, and viewing
+Plug 'sirver/ultisnips'                 " Snippet engine (expand shortcuts into templates)
+Plug 'christoomey/vim-tmux-navigator'   " Seamless Ctrl+h/j/k/l between vim splits and tmux panes
+Plug 'dracula/vim', { 'as': 'dracula' } " Dracula color scheme
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+call plug#end()
+
+
+" ----------------------------------------------------------------------------
+" Plugin settings
+" ----------------------------------------------------------------------------
+
+" --- vimtex / LaTeX ---
+let g:tex_flavor = 'latex'              " Treat all .tex files as LaTeX (not plain TeX)
+let g:vimtex_view_method = 'skim'       " Use Skim as the PDF viewer
+let g:vimtex_quickfix_mode = 0          " Don't auto-open the quickfix window on compile errors/warnings
+
+" Concealment: display LaTeX commands as the symbols they produce
+" (e.g. \alpha shows as α) when the cursor isn't on that line
+set conceallevel=1
+let g:tex_conceal = 'abdmg'             " Conceal: a=accents, b=bold/italic, d=delimiters, m=math symbols, g=Greek
+
+" --- UltiSnips ---
+let g:UltiSnipsExpandTrigger = '<tab>'          " <Tab>   -> expand a snippet
+let g:UltiSnipsJumpForwardTrigger = '<tab>'     " <Tab>   -> jump to the next placeholder
+let g:UltiSnipsJumpBackwardTrigger = '<s-tab>'  " <S-Tab> -> jump to the previous placeholder
+
+" --- coc.nvim ---
+let g:coc_global_extensions = ['coc-jedi']
+set updatetime=300          " faster diagnostics and hover (default is 4000ms)
+set signcolumn=yes          " stop text shifting when errors appear
+
+" Tab / Shift-Tab to move through the completion menu
+inoremap <silent><expr> <Tab>   coc#pum#visible() ? coc#pum#next(1) : "\<Tab>"
+inoremap <silent><expr> <S-Tab> coc#pum#visible() ? coc#pum#prev(1) : "\<S-Tab>"
+
+" Enter to accept the selected completion
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
+
+" Navigation
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gr <Plug>(coc-references)
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" Show documentation with K
+nnoremap <silent> K :call CocActionAsync('doHover')<CR>
+
+" Rename symbol
+nmap <leader>rn <Plug>(coc-rename)
+" ----------------------------------------------------------------------------
+" Color scheme (must come after plug#end so the plugin is loaded)
+" ----------------------------------------------------------------------------
+
+colorscheme dracula
